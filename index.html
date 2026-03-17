@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+   </head>
+
+  <body>
+    <h3>To-Do</h3>
+    <input id="taskInput" placeholder="Add task..." />
+    <button onclick="addTask()">+</button>
+   <ul id="list"></ul>
+
+<script>
+  let draggedItem = null;
+
+  function addTask() {
+    const input = document.getElementById('taskInput');
+    if (!input.value) return;
+
+    const li = document.createElement('li');
+    li.draggable = true;
+
+   
+    const bullet = document.createElement('span');
+    bullet.textContent = '•';
+    const textSpan = document.createElement('span');
+    textSpan.textContent = input.value;
+    textSpan.classList.add('task-text');
+
+    // group bullet + text together
+    const textContainer = document.createElement('div');
+    textContainer.style.display = 'flex';
+    textContainer.style.alignItems = 'center';
+    textContainer.style.gap = '6px';
+
+    textSpan.onclick = function () {
+    li.classList.toggle('done');
+};
+
+    textContainer.appendChild(bullet);
+    textContainer.appendChild(textSpan);
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'X';
+    delBtn.onclick = function (e) {
+    e.stopPropagation();
+    li.remove();
+};
+
+    li.appendChild(textContainer);
+    li.appendChild(delBtn);
+
+
+    li.addEventListener('dragstart', () => {
+      draggedItem = li;
+      li.classList.add('dragging');
+    });
+
+    li.addEventListener('dragend', () => {
+      draggedItem = null;
+      li.classList.remove('dragging');
+    });
+
+    li.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    li.addEventListener('drop', () => {
+      if (draggedItem !== li) {
+        const list = document.getElementById('list');
+        const items = [...list.children];
+        const draggedIndex = items.indexOf(draggedItem);
+        const targetIndex = items.indexOf(li);
+
+        if (draggedIndex < targetIndex) {
+          li.after(draggedItem);
+        } else {
+          li.before(draggedItem);
+        }
+      }
+    });
+
+    document.getElementById('list').appendChild(li);
+    input.value = '';
+  }
+
+  const input = document.getElementById('taskInput');
+
+input.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') {
+    addTask();
+  }
+});
+</script>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 16px;
+        width: 260px;
+      }
+      input {
+        width: 140px;
+        padding: 4px;
+      }
+      button {
+        padding: 4px 8px;
+        margin-left: 4px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin-top: 12px;
+      }
+      li {
+        padding: 6px 0;
+        cursor: pointer;
+      }
+
+    </style>
+  </body>
+</html>
